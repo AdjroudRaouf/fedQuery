@@ -1,0 +1,11 @@
+  
+  
+  
+  File dataDir = new File("C:\\Users\\adjroud\\Desktop\\nativestore\\");
+
+		
+		Repository repository = new SailRepository(new NativeStore(dataDir));
+                repository.initialize();
+le fichier RDF contenant les données à charger  
+File fileToAdd = new File("C:\\Users\\adjroud\\Downloads\\export.rdf");  
+repository.getConnection().add(fileToAdd,RDF.NAMESPACE,RDFFormat.RDFA);
