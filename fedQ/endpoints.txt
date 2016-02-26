@@ -1,0 +1,3 @@
+http://transparency.270a.info/sparql
+http://dbpedia.org/sparql
+http://www.semantic-systems-biology.org/biogateway/endpoint
