@@ -141,6 +141,115 @@ i=i+3;
     }
     
     
+   public Boolean askSource(String request, RepositoryConnection connection)
+            throws RepositoryException, MalformedQueryException,
+            QueryEvaluationException {
+
+        String requteASK = "ASK  {" + request + "}";
+        System.out.println(requteASK);
+        
+        BooleanQuery booleanQuery = connection.prepareBooleanQuery(
+                QueryLanguage.SPARQL, requteASK);
+
+        Boolean result = booleanQuery.evaluate();
+
+        return result;
+
+    }
+   
+   
+   
+   
+   
+   
+    public String[] getTriplePattern(String query) throws IOException {
+
+        ANTLRFileStream inputQuery = new ANTLRFileStream(query);
+        String req = inputQuery.toString();
+        return req.split(System.getProperty("line.separator"));
+
+    }
+
+    public String[] getEndPointsList(String endPoints) throws IOException {
+        // RÃ©cupÃ©rer les endPoints
+        ANTLRFileStream inputSource = new ANTLRFileStream(endPoints);
+        String sources = inputSource.toString();
+        String[] linesSources = sources.split(System
+                .getProperty("line.separator"));
+        System.out.println(linesSources.length);
+        Vector<String> vsource = new Vector<String>();
+
+        String[] nvList = new String[vsource.size()];
+
+        for (int j = 0; j < vsource.size(); j++) {
+            nvList[j] = vsource.get(j);
+        }
+        return linesSources;
+    }
+    
+    
+    
+    
+    
+    
+    public Vector<Vector> getPertSources(String[] s, String[] s2) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+
+        Vector<Vector> v = new Vector<>();
+
+        for (int i = 2; i < s.length - 1; i++) {
+            for (int j = 0; j < s2.length; j++) {
+
+                String rqt = "select * where {" + s[i] + "}";
+
+                Repository rep = new SPARQLRepository(s2[j]);
+                rep.initialize();
+                RepositoryConnection c = rep.getConnection();
+
+                boolean b = askSource(rqt, c);
+                System.out.println(b);
+
+                Vector l = new Vector();
+                l.add(i);
+                l.add(j);
+                l.add(b);
+                v.add(l);
+
+            }
+        }
+
+        for (int i = 0; i < v.size(); i++) {
+            System.out.println(v.elementAt(i).elementAt(0));
+            System.out.println(v.elementAt(i).elementAt(1));
+            System.out.println(v.elementAt(i).elementAt(2));
+            System.out.println("********************************");
+        }
+
+        return v;
+    }
+    
+    
+    
+     public void FromSourceToRepo(RepositoryConnection con, String request,
+            RepositoryConnection connection)
+            throws Exception, MalformedQueryException {
+
+        String constructQuery = "CONSTRUCT  { " + request + "} where  { "
+                + request + "} LIMIT 10";
+
+        GraphQueryResult graphResult;
+        graphResult = connection.prepareGraphQuery(QueryLanguage.SPARQL,
+                constructQuery).evaluate();
+
+        while (graphResult.hasNext()) {
+
+            graphResult.next();
+            System.out.println("graphe   :"  +graphResult.next());
+
+            con.add(graphResult.next().getSubject(), graphResult.next().getPredicate(), graphResult.next().getObject());
+
+        }
+
+    }
     
     
     
