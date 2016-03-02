@@ -1,51 +1,51 @@
 package fedQ.fedQ;
 
-//import Methods;
-//import Repository;
-//import SPARQLRepository;
-
+import static com.oracle.nio.BufferSecrets.instance;
+import static com.sun.org.apache.regexp.internal.RETest.test;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.Vector;
-
+import jdk.nashorn.internal.objects.NativeDebug;
+import static jdk.nashorn.internal.objects.NativeRegExp.test;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sparql.SPARQLRepository;
+import org.openrdf.sail.nativerdf.NativeStore;
+import static sun.awt.image.PixelConverter.Ushort4444Argb.instance;
 
 /**
- * Hello world!
  *
+ * @author adjroud
  */
-public class App 
-{
-    public static void main( String[] args ) throws Exception 
-    {
-        //System.out.println( "Hello World!" );
-    
-		File dataDir = new File(UserConfig.storePath+"\\nativestore");
-		Methods m=new Methods();
-		Repository repo= m.CreateNativeStore(dataDir);
-		repo.initialize();
+public class main {
 
-		//        
-		//        File file = new File("C:\\Users\\adjroud\\Downloads\\export.rdf");
-		//String baseURI = "http://example.org/example/local";
-		//        m.AddRdfData(repo, file, baseURI);
+    public static void main(String[] args) throws Exception {
+        //instancier la class qui conient les methodes
+        Methods m = new Methods();
 
-		Repository repository = new SPARQLRepository("http://www.linkedmdb.org/sparql");
-		//Repository repository = new SPARQLRepository("http://localhost:8080/openrdf-sesame/repositories/raffa");
-		repository.initialize(); 
+        //creation et initialisation d un depot local
+        Repository repo = m.CreateNativeStore();
+        repo.initialize();
 
-		String requete ="SELECT * WHERE {?subject ?pridicate ?object} LIMIT 50";
+        //creation d'une connexion
+        RepositoryConnection con = repo.getConnection();
 
+        //recuperer les triple paternes
+        String[] s = m.getTriplePattern();
 
+        //recuperer le sources pertinantes 
+        HashMap<MapKey, Boolean> res = m.askSourceForTriplePattern(s);
 
+        // recuperer les resultats et les ajouter dans le depot local
+        m.getResults(con, res);
 
-		Vector v= m.GetFromRepo(repository, requete);
-		System.out.println(v.size());
-
-
-		m.AddToRepo(v, repo);
-
-		m.affichertt(repo, requete);
+        //afficher le contenu do depot local   
+        m.viewAll(con);
 
     }
+
 }
